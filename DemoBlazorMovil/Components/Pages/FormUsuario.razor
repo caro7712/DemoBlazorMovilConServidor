@@ -1,0 +1,96 @@
+﻿@page "/FormUsuario/{id:int}"
+@using DemoBlazorMovil.Shared.Models
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+<h3>@(id == 0 ? "Nuevo Usuario" : "Editar Usuario")</h3>
+
+@if (UsuarioDTO == null)
+{
+    <p>Cargando...</p>
+}
+else
+{
+    <EditForm Model="UsuarioDTO" OnValidSubmit="GuardarUsuario">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-3">
+            <label class="form-label">Nombre</label>
+            <InputText @bind-Value="UsuarioDTO.Name" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Domicilio</label>
+            <InputText @bind-Value="UsuarioDTO.Domicilio" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Correo</label>
+            <InputText @bind-Value="UsuarioDTO.Correo" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Contraseña</label>
+            <InputText @bind-Value="UsuarioDTO.Contraseña" type="password" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Rol</label>
+            <InputText @bind-Value="UsuarioDTO.Rol" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Imagen (URL)</label>
+            <InputText @bind-Value="UsuarioDTO.Imagen" class="form-control" />
+        </div>
+
+        @if (!string.IsNullOrEmpty(UsuarioDTO.Imagen))
+        {
+            <div class="mb-3">
+                <img src="@UsuarioDTO.Imagen" class="img-thumbnail" style="max-width: 150px;" />
+            </div>
+        }
+
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <button type="button" class="btn btn-secondary ms-2" @onclick="Cancelar">Cancelar</button>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+
+    private UsuarioDTO UsuarioDTO;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (id == 0)
+        {
+            UsuarioDTO = new UsuarioDTO();
+        }
+        else
+        {
+            UsuarioDTO = await Http.GetFromJsonAsync<UsuarioDTO>($"Usuario/{id}");
+        }
+    }
+
+    private async Task GuardarUsuario()
+    {
+        if (id == 0)
+        {
+            await Http.PostAsJsonAsync("Usuario", UsuarioDTO);
+        }
+        else
+        {
+            await Http.PutAsJsonAsync($"Usuario/{id}", UsuarioDTO);
+        }
+
+        NavigationManager.NavigateTo("/ListaUsuario");
+    }
+
+    private void Cancelar()
+    {
+        NavigationManager.NavigateTo("/ListaUsuario");
+    }
+}

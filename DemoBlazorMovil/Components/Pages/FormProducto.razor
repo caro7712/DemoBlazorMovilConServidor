@@ -1,0 +1,87 @@
+﻿@page "/FormProducto/{id:int}"
+@using DemoBlazorMovil.Shared.Models
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+<h3>@(id == 0 ? "Nuevo Producto" : "Editar Producto")</h3>
+
+@if (Producto == null)
+{
+    <p>Cargando...</p>
+}
+else
+{
+    <EditForm Model="Producto" OnValidSubmit="GuardarProducto">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-3">
+            <label class="form-label">Nombre</label>
+            <InputText @bind-Value="Producto.Name" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Precio</label>
+            <InputNumber @bind-Value="Producto.Precio" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Stock</label>
+            <InputNumber @bind-Value="Producto.Stock" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Foto (URL)</label>
+            <InputText @bind-Value="Producto.Foto" class="form-control" />
+        </div>
+
+        @if (!string.IsNullOrEmpty(Producto.Foto))
+        {
+            <div class="mb-3">
+                <img src="@Producto.Foto" class="img-thumbnail" style="max-width: 150px;" />
+            </div>
+        }
+
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <button type="button" class="btn btn-secondary ms-2" @onclick="Cancelar">Cancelar</button>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+
+    private ProductoDTO Producto;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (id == 0)
+        {
+            Producto = new ProductoDTO(); // Nuevo producto
+        }
+        else
+        {
+            // Traer producto existente desde la API
+            Producto = await Http.GetFromJsonAsync<ProductoDTO>($"Producto/{id}");
+        }
+    }
+
+    private async Task GuardarProducto()
+    {
+        if (id == 0)
+        {
+            await Http.PostAsJsonAsync("Producto", Producto);
+        }
+        else
+        {
+            await Http.PutAsJsonAsync($"Producto/{id}", Producto);
+        }
+
+        NavigationManager.NavigateTo("/ListaProductos");
+    }
+
+    private void Cancelar()
+    {
+        NavigationManager.NavigateTo("/ListaProductos");
+    }
+}

@@ -1,0 +1,59 @@
+﻿@page "/ListaUsuario"
+@using DemoBlazorMovil.Shared.Models
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+<h3>Lista de Usuarios</h3>
+
+<div class="mb-3">
+    <button class="btn btn-success" @onclick="AgregarUsuario">Agregar Usuario</button>
+    <button class="btn btn-secondary ms-2" @onclick="IrAMenu">Ir al Menú</button>
+</div>
+
+@if (Usuarios == null)
+{
+    <p>Cargando usuarios...</p>
+}
+else if (!Usuarios.Any())
+{
+    <p>No hay usuarios disponibles.</p>
+}
+else
+{
+    @foreach (var usuario in Usuarios)
+    {
+        <ItemUsuario Usuario="@usuario" OnDeleted="RefrescarLista" />
+    }
+}
+
+@code {
+    private List<UsuarioDTO> Usuarios;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RefrescarLista();
+    }
+
+    private async Task RefrescarLista()
+    {
+        try
+        {
+            // Llamada relativa al BaseAddress configurado en MauiProgram (7001)
+            Usuarios = await Http.GetFromJsonAsync<List<UsuarioDTO>>("usuario");
+        }
+        catch
+        {
+            Usuarios = new List<UsuarioDTO>();
+        }
+    }
+
+    private void AgregarUsuario()
+    {
+        NavigationManager.NavigateTo("/FormUsuario/0"); // Nuevo usuario
+    }
+
+    private void IrAMenu()
+    {
+        NavigationManager.NavigateTo("/menu");
+    }
+}

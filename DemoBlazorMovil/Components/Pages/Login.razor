@@ -1,0 +1,64 @@
+﻿@page "/"
+
+@using DemoBlazorMovil.Shared.Services
+@using DemoBlazorMovil.Shared.Models
+@namespace DemoBlazorMovil.Components.Pages
+@inject NavigationManager NavigationManager
+@inject IServiceUsuario usuarioService
+
+<div class="d-flex flex-column align-items-center mt-4 mx-auto"
+     style="background-color:aquamarine; width: 90%; max-width: 400px; padding: 20px; border-radius: 10px;">
+
+    <h3 class="text-center mt-4">Login</h3>
+
+    <!-- Imagen responsiva -->
+    <img src="img/imagen.png" alt="Paisaje" class="img-fluid my-4" style="max-width: 100%; height: auto;" />
+
+    <!-- Usuario -->
+    <label>Usuario</label>
+    <input @bind="nombreUsuario" placeholder="Inserte Usuario"
+           class="form-control text-center mb-3" style="width: 100%;" />
+
+    <!-- Contraseña -->
+    <label>Contraseña</label>
+    <input @bind="contraseña" placeholder="Ingrese Contraseña" type="password"
+           class="form-control text-center mb-3" style="width: 100%;" />
+
+    <!-- Botón -->
+    <button class="btn btn-primary w-100" @onclick="IniciarSesion">Iniciar Sesión</button>
+
+    <!-- Mensaje de error -->
+    @if (!string.IsNullOrEmpty(mensaje))
+    {
+        <div class="alert alert-danger mt-3 text-center">@mensaje</div>
+    }
+</div>
+
+@code {
+    private string nombreUsuario;
+    private string contraseña;
+    private string mensaje;
+
+    private async Task IniciarSesion()
+    {
+        if (string.IsNullOrWhiteSpace(nombreUsuario) || string.IsNullOrWhiteSpace(contraseña))
+        {
+            mensaje = "Por favor complete todos los campos.";
+            StateHasChanged();
+            return;
+        }
+
+        var usuario = await usuarioService.LoginAsync(nombreUsuario, contraseña);
+
+        if (usuario != null)
+        {
+            mensaje = string.Empty;
+            NavigationManager.NavigateTo("/home");
+        }
+        else
+        {
+            mensaje = "Credenciales incorrectas.";
+            StateHasChanged();
+        }
+    }
+}

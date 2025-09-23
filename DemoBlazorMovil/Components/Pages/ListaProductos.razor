@@ -1,0 +1,50 @@
+﻿@page "/ListaProductos"
+@using DemoBlazorMovil.Shared.Models
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+<button class="btn btn-secondary mb-3" @onclick="IrAMenu">
+    Ir al Menú
+</button>
+
+<h3>Lista de Productos</h3>
+
+<button class="btn btn-success mb-3" @onclick="CrearProducto">
+    Crear Producto
+</button>
+
+@if (listaProductos == null || !listaProductos.Any())
+{
+    <p>No hay productos disponibles.</p>
+}
+else
+{
+    @foreach (var producto in listaProductos)
+    {
+        <ItemProducto Producto="@producto" OnDeleted="RefrescarLista" />
+    }
+}
+
+@code {
+    private List<ProductoDTO> listaProductos = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RefrescarLista();
+    }
+
+    private void IrAMenu()
+    {
+        NavigationManager.NavigateTo("/menu");
+    }
+
+    private void CrearProducto()
+    {
+        NavigationManager.NavigateTo("/FormProducto/0");
+    }
+
+    private async Task RefrescarLista()
+    {
+        listaProductos = await Http.GetFromJsonAsync<List<ProductoDTO>>("Producto");
+    }
+}

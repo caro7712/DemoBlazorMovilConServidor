@@ -1,0 +1,34 @@
+﻿@page "/home"
+@using Microsoft.AspNetCore.Components
+
+@inject NavigationManager navigationManager
+<button class="btn btn-secondary" @onclick="IrAMenu">
+    <i class="bi bi-list me-2"></i> Ir al Menú
+</button>
+
+<div class="container mt-5">
+    <div class="row align-items-center">
+        <div class="col-md-6">
+            <h1 class="display-4">¡Bienvenido a Utiles Escolares Nova!</h1>
+            <p class="lead">
+                Encontrá todo lo que necesitás para la escuela: cuadernos, lápices, mochilas, colores y mucho más.
+                Prepará tu kit escolar con productos de calidad y al mejor precio.
+            </p>
+            <a class="btn btn-primary btn-lg mt-3" href="/productos">Ver Catálogo</a>
+        </div>
+        <div class="col-md-6 text-center">
+            <img src="/img/bienvenidos_A_Utiles_Escolares_Nova.png"
+                 class="img-fluid rounded shadow"
+                 alt="Bienvenidos a Útiles Escolares Nova" />
+
+        </div>
+    </div>
+</div>
+@code{
+
+    private void IrAMenu()
+    {
+        navigationManager.NavigateTo("/menu");
+    }
+}
+

@@ -1,0 +1,72 @@
+﻿@page "/menu"
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+<div class="d-flex justify-content-center align-items-center vh-100 bg-light">
+    <div class="container">
+        <h3 class="text-center mb-4">Menú Principal</h3>
+
+        <div class="row">
+            <div class="col-md-6 d-flex justify-content-center mb-3">
+                <button class="btn btn-primary w-100 py-3" @onclick="IrHome">
+                    <i class="bi bi-house-door-fill me-2"></i> Home
+                </button>
+            </div>
+            <div class="col-md-6 d-flex justify-content-center mb-3">
+                <button class="btn btn-success w-100 py-3" @onclick="IrProducto">
+                    <i class="bi bi-box-seam me-2"></i> Productos
+                </button>
+            </div>
+            <div class="col-md-6 d-flex justify-content-center mb-3">
+                <button class="btn btn-info text-white w-100 py-3" @onclick="IrUsuarios">
+                    <i class="bi bi-people-fill me-2"></i> Usuarios
+                </button>
+            </div>
+            <div class="col-md-6 d-flex justify-content-center mb-3">
+                <button class="btn btn-danger w-100 py-3" @onclick="IrLogin">
+                    <i class="bi bi-box-arrow-right me-2"></i> Salir
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmación -->
+<div class="modal fade" id="modalSalir" tabindex="-1" aria-labelledby="modalSalirLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="modalSalirLabel">Confirmar salida</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                ¿Estás seguro de que querés salir?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" @onclick="IrLogin">Salir</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private void IrHome() => NavigationManager.NavigateTo("/home");
+    private void IrProducto() => NavigationManager.NavigateTo("/ListaProductos");
+    private void IrUsuarios() => NavigationManager.NavigateTo("/ListaUsuario"); // <-- Aquí apuntamos a la lista completa
+
+    private async Task IrLogin()
+    {
+        var modalRef = await JS.InvokeAsync<IJSObjectReference>("bootstrap.Modal.getOrCreateInstance", "#modalSalir");
+        await modalRef.InvokeVoidAsync("hide");
+
+        await Task.Delay(300);
+        NavigationManager.NavigateTo("/");
+    }
+
+    private async Task MostrarModal()
+    {
+        var modalRef = await JS.InvokeAsync<IJSObjectReference>("bootstrap.Modal.getOrCreateInstance", "#modalSalir");
+        await modalRef.InvokeVoidAsync("show");
+    }
+}
